@@ -1,7 +1,9 @@
 from graph import *
 import math
 from sys import platform
-
+def Abs(a):
+    if a<0:
+        return -a
 def GenerateWall(deltaSize):
     global walls, wallCoords
     walls = []
@@ -13,6 +15,18 @@ def GenerateWall(deltaSize):
     for i in range(size):
         w = rectangle(wallCoord[i][0],wallCoord[i][1],wallCoord[i][0]+deltaSize,wallCoord[i][1]+deltaSize)
         walls.append(w)
+def CheckWallCollision(bullet):
+    mark = False
+    for w in walls:
+        wX = coords(w)[0]
+        wY = coords(w)[1]
+        bX = coords(bullet)[0]
+        bY = coords(bullet)[1]
+        if (Abs(wX -bX)< 5 and Abs(wY-bY)< 5):
+            moveObjectTo(w,600,600)
+            mark = True
+    return  mark
+
 
 
 def gun_draw(new_angle):
@@ -67,7 +81,6 @@ def keyPressed(event):
 		elif event.keycode == VK_ESCAPE:
 			close()
 	elif platform == "linux":
-		global dx, dy, bulletbool
 		if event.keycode == VK_INSERT:  # Q
 			gun_draw(angle + 5)
 		elif event.keycode == VK_DELETE:  # E
@@ -110,6 +123,7 @@ def shooting():
 
 def bulletFly():
 	global bulletbool, bulletFlybool, t
+
 	if bulletFlybool==True:
 		aRad = angle * math.pi / 180
 		moveObjectBy(bullet, int( L * math.cos(aRad))//10, - int(L * math.sin(aRad))//10)
