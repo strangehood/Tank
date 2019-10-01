@@ -65,15 +65,15 @@ def wall_check(side_number):  # 1 - left ; 2 - right; 3 - up; 4 - down;
     elif (y0 > 365) and (dy > 0) and (side_number == 4):
         wall_bool = True
     return wall_bool
-
-
+#######################
+#create shooting f-ns:#
+#######################
 def shooting_check():
     bullet_bool = True
     return bullet_bool
 
-
 def shooting():
-    global  bulletbool
+    global bulletbool
     moveObjectTo(bullet, x0, y0)
     bulletbool = False
 
