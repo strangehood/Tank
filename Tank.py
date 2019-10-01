@@ -1,4 +1,5 @@
 from graph import *
+from sys import platform
 import math
 
 
@@ -7,7 +8,7 @@ def gun_draw(new_angle):
     angle = new_angle
     penColor('black')
     aRad = angle * math.pi / 180
-    x1 = x0 + L * math.cos(aRad)
+    x1 = x0 + L * math.cos(aRad) 
     y1 = y0 - L * math.sin(aRad)
     if gun == None:
         gun = line(x0, y0, x1, y1)
@@ -19,7 +20,7 @@ def gun_draw(new_angle):
 
 
 def movement():
-    global hull, gun, tower, angle, dx, dy, x1, x0, y1, y0
+    global hull, gun, tower, bullet, angle, angleb, bulletbool, dx, dy, x1, x0, y1, y0, vb
     if (wall_check(1) is True) or (wall_check(2) is True):
         dx = 0
     elif (wall_check(3) is True) or (wall_check(4) is True):
@@ -32,24 +33,33 @@ def movement():
     gun_draw(angle)
     moveObjectBy(tower, dx, dy)
     dx = dy = 0
+    if (bulletbool == False):
+        moveObjectBy(bullet, vb*math.cos(angleb * math.pi / 180), -vb*math.sin(angleb * math.pi / 180))
+    else:
+        moveObjectTo(bullet, x0, y0)
+    if ((xCoord (bullet) < 0) or (xCoord (bullet) > 400) or(yCoord (bullet) < 0) or (yCoord (bullet) > 400)):
+        moveObjectTo(bullet, x0, y0)
+        bulletbool = True
+		
+		
 
 
 def keyPressed(event):
     global dx, dy, bulletbool
-    if event.keycode == 0x51:  # Q
+    if event.keycode == VK_HOME:  # Q
         gun_draw(angle + 5)
-    elif event.keycode == 0x45:  # E
+    elif event.keycode == VK_END:  # E
         gun_draw(angle - 5)
-    elif event.keycode == 0x57:  # W
+    elif event.keycode == VK_UP:  # W
         dy = -5
-    elif event.keycode == 0x53:  # S
+    elif event.keycode == VK_DOWN:  # S
         dy = 5
-    elif event.keycode == 0x41:  # A
+    elif event.keycode == VK_LEFT:  # A
         dx = -5
-    elif event.keycode == 0x44:  # D
+    elif event.keycode == VK_RIGHT:  # D
         dx = 5
-    elif (event.keycode == VK_SPACE) and (bulletbool is True):
-        pass
+    elif (event.keycode == VK_SPACE) and (bulletbool == True):
+        shooting()
     elif event.keycode == VK_ESCAPE:
         close()
 
@@ -73,9 +83,10 @@ def shooting_check():
     return bullet_bool
 
 def shooting():
-    global bulletbool
+    global bulletbool, angle, angleb
     moveObjectTo(bullet, x0, y0)
     bulletbool = False
+    angleb = angle
 
 
 windowSize(400, 400)
@@ -90,6 +101,9 @@ x1 = 100
 y1 = 100
 x0 = 140
 y0 = 140
+angle = 0
+angleb = 0
+vb = 7
 penColor('red')
 brushColor('red')
 bullet = circle(-5, -5, 3)
