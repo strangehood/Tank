@@ -88,8 +88,10 @@ def shooting():
     global bulletbool
     moveObjectTo(bullet, x0, y0)
     bulletbool = False
+
 global walls, wallCoords
 GenerateWall(50)
+
 windowSize(400, 400)
 canvasSize(400, 400)
 gun = None
