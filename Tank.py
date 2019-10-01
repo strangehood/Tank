@@ -1,6 +1,6 @@
 from graph import *
 import math
-
+from sys import platform
 
 def gun_draw(new_angle):
     global tower, L, angle, gun, x1, y1, x0, y0
@@ -33,26 +33,44 @@ def movement():
     moveObjectBy(tower, dx, dy)
     dx = dy = 0
 
-
 def keyPressed(event):
-    global dx, dy, bulletbool
-    if event.keycode == 0x51:  # Q
-        gun_draw(angle + 5)
-    elif event.keycode == 0x45:  # E
-        gun_draw(angle - 5)
-    elif event.keycode == 0x57:  # W
-        dy = -5
-    elif event.keycode == 0x53:  # S
-        dy = 5
-    elif event.keycode == 0x41:  # A
-        dx = -5
-    elif event.keycode == 0x44:  # D
-        dx = 5
-    elif (event.keycode == VK_SPACE) and (bulletbool is True):
-        pass
-    elif event.keycode == VK_ESCAPE:
-        close()
-
+	if platform == "win32" or platform == "cygwin":
+		global dx, dy, bulletbool
+		if event.keycode == 0x51:  # Q
+			gun_draw(angle + 5)
+		elif event.keycode == 0x45:  # E
+			gun_draw(angle - 5)
+		elif event.keycode == 0x57:  # W
+			dy = -5
+		elif event.keycode == 0x53:  # S
+			dy = 5
+		elif event.keycode == 0x41:  # A
+			dx = -5
+		elif event.keycode == 0x44:  # D
+			dx = 5
+		elif (event.keycode == VK_SPACE) and (bulletbool is True):
+			shooting()
+		elif event.keycode == VK_ESCAPE:
+			close()
+	elif platform == "linux":
+		global dx, dy, bulletbool
+		if event.keycode == VK_INSERT:  # Q
+			gun_draw(angle + 5)
+		elif event.keycode == VK_DELETE:  # E
+			gun_draw(angle - 5)
+		elif event.keycode == VK_UP:  # W
+			dy = -5
+		elif event.keycode ==  VK_DOWN:  # S
+			dy = 5
+		elif event.keycode == VK_LEFT:  # A
+			dx = -5
+		elif event.keycode == VK_RIGHT:  # D
+			dx = 5
+		elif (event.keycode == VK_SPACE) and (bulletbool is True):
+			shooting()
+		elif event.keycode == VK_ESCAPE:
+			close()
+        
 
 def wall_check(side_number):  # 1 - left ; 2 - right; 3 - up; 4 - down;
     wall_bool = False
@@ -65,27 +83,38 @@ def wall_check(side_number):  # 1 - left ; 2 - right; 3 - up; 4 - down;
     elif (y0 > 365) and (dy > 0) and (side_number == 4):
         wall_bool = True
     return wall_bool
-#######################
-#create shooting f-ns:#
-#######################
+
 def shooting_check():
-    bullet_bool = True
-    return bullet_bool
+	global bulletbool
+	bulletbool=True
 
 def shooting():
-    global bulletbool
+    global bulletbool, bulletFlybool
     moveObjectTo(bullet, x0, y0)
     bulletbool = False
+    bulletFlybool=True
+
+def bulletFly():
+	global bulletbool, bulletFlybool, t
+	if bulletFlybool==True:
+		aRad = angle * math.pi / 180
+		moveObjectBy(bullet, int( L * math.cos(aRad))//10, - int(L * math.sin(aRad))//10)
+		t=t+1
+	if t>100:
+		t=0
+		bulletFlybool=False
+		moveObjectTo(bullet, -5, -5)
 
 
 windowSize(400, 400)
 canvasSize(400, 400)
 gun = None
-
+t=0 # время полета пули
 penColor('green')
 brushColor('green')
 hull = rectangle(110, 110, 170, 170)
-bulletbool = True
+bulletbool = False
+bulletFlybool=False
 x1 = 100
 y1 = 100
 x0 = 140
@@ -94,10 +123,11 @@ penColor('red')
 brushColor('red')
 bullet = circle(-5, -5, 3)
 dx = dy = 1
-penSize(7)
+penSize(9)
 L = math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0))
 gun_draw(0)
 onKey(keyPressed)
 onTimer(shooting_check, 1000)
 onTimer(movement, 50)
+onTimer(bulletFly, 10)
 run()
