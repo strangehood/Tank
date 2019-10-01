@@ -1,6 +1,18 @@
 from graph import *
 import math
 
+def GenerateWall(deltaSize):
+    global walls, wallCoords
+    walls = []
+    size = 4
+    color = randColor()
+    wallCoord = ((0,0),(0+deltaSize,0),(0,0+deltaSize),(0,0+2*deltaSize))
+    penColor(color)
+    brushColor(color)
+    for i in range(size):
+        w = rectangle(wallCoord[i][0],wallCoord[i][1],wallCoord[i][0]+deltaSize,wallCoord[i][1]+deltaSize)
+        walls.append(w)
+
 
 def gun_draw(new_angle):
     global tower, L, angle, gun, x1, y1, x0, y0
@@ -76,8 +88,8 @@ def shooting():
     global bulletbool
     moveObjectTo(bullet, x0, y0)
     bulletbool = False
-
-
+global walls, wallCoords
+GenerateWall(50)
 windowSize(400, 400)
 canvasSize(400, 400)
 gun = None
