@@ -20,48 +20,84 @@ def gun_draw(new_angle):
 
 
 def movement():
-    global hull, gun, tower, bullet, angle, angleb, bulletbool, dx, dy, x1, x0, y1, y0, vb
-    if (wall_check(1) is True) or (wall_check(2) is True):
-        dx = 0
-    elif (wall_check(3) is True) or (wall_check(4) is True):
-        dy = 0
-    x0 += dx
-    x1 += dx
-    y0 += dy
-    y1 += dy
-    moveObjectBy(hull, dx, dy)
-    gun_draw(angle)
-    moveObjectBy(tower, dx, dy)
-    dx = dy = 0
-    if (bulletbool == False):
-        moveObjectBy(bullet, vb*math.cos(angleb * math.pi / 180), -vb*math.sin(angleb * math.pi / 180))
-    else:
-        moveObjectTo(bullet, x0, y0)
-    if ((xCoord (bullet) < 0) or (xCoord (bullet) > 400) or(yCoord (bullet) < 0) or (yCoord (bullet) > 400)):
-        moveObjectTo(bullet, x0, y0)
-        bulletbool = True
+    global hull, gun, tower, bullet, angle, angleb, bulletbool, dx, dy, x1, x0, y1, y0, vb, start
+    if start:
+        if (wall_check(1) is True) or (wall_check(2) is True):
+            dx = 0
+        elif (wall_check(3) is True) or (wall_check(4) is True):
+            dy = 0
+        x0 += dx
+        x1 += dx
+        y0 += dy
+        y1 += dy
+        moveObjectBy(hull, dx, dy)
+        gun_draw(angle)
+        moveObjectBy(tower, dx, dy)
+        dx = dy = 0
+        if (bulletbool == False):
+            moveObjectBy(bullet, vb*math.cos(angleb * math.pi / 180), -vb*math.sin(angleb * math.pi / 180))
+        else:
+            moveObjectTo(bullet, x0, y0)
+        if ((xCoord (bullet) < 0) or (xCoord (bullet) > 400) or(yCoord (bullet) < 0) or (yCoord (bullet) > 400)):
+            moveObjectTo(bullet, x0, y0)
+            bulletbool = True
 		
 		
 
 
 def keyPressed(event):
-    global dx, dy, bulletbool
-    if event.keycode == VK_HOME:  # Q
-        gun_draw(angle + 5)
-    elif event.keycode == VK_END:  # E
-        gun_draw(angle - 5)
-    elif event.keycode == VK_UP:  # W
-        dy = -5
-    elif event.keycode == VK_DOWN:  # S
-        dy = 5
-    elif event.keycode == VK_LEFT:  # A
-        dx = -5
-    elif event.keycode == VK_RIGHT:  # D
-        dx = 5
-    elif (event.keycode == VK_SPACE) and (bulletbool == True):
-        shooting()
-    elif event.keycode == VK_ESCAPE:
-        close()
+    global dx, dy, bulletbool, menuEv, start, angle, vb, bullet, angleb, L, hull, x0,x1,y0,y1
+    if start:
+        if event.keycode == VK_HOME:  # Q
+            gun_draw(angle + 5)
+        elif event.keycode == VK_END:  # E
+            gun_draw(angle - 5)
+        elif event.keycode == VK_UP:  # W
+            dy = -5
+        elif event.keycode == VK_DOWN:  # S
+            dy = 5
+        elif event.keycode == VK_LEFT:  # A
+            dx = -5
+        elif event.keycode == VK_RIGHT:  # D
+           dx = 5
+        elif (event.keycode == VK_SPACE) and (bulletbool == True):
+            shooting()
+        elif event.keycode == VK_ESCAPE:
+            close()
+    else:
+        if event.keycode == VK_UP and menuEv > 0:
+            menuEv -= 1
+        elif event.keycode == VK_DOWN and menuEv < 2:
+            menuEv += 1
+        elif event.keycode == VK_SPACE:
+            if menuEv == 0:
+                start = True
+                x1 = 100
+                y1 = 100
+                x0 = 140
+                y0 = 140
+                angle = 0
+                angleb = 0
+                vb = 7
+                penColor('green')
+                brushColor('green')
+                hull = rectangle(110, 110, 170, 170)
+                penColor('red')
+                brushColor('red')
+                bullet = circle(-5, -5, 3)
+                dx = dy = 1
+                penSize(7)
+                L = math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0))
+                gun_draw(0)
+            if menuEv == 2:
+                close()
+
+        if menuEv == 0:
+            print('START')
+        elif menuEv == 1:
+            print('SETTINGS ')
+        elif menuEv == 2:
+            print('EXIT ')
 
 
 def wall_check(side_number):  # 1 - left ; 2 - right; 3 - up; 4 - down;
@@ -91,25 +127,14 @@ windowSize(400, 400)
 canvasSize(400, 400)
 gun = None
 
-penColor('green')
-brushColor('green')
-hull = rectangle(110, 110, 170, 170)
+
 bulletbool = True
-x1 = 100
-y1 = 100
-x0 = 140
-y0 = 140
-angle = 0
-angleb = 0
-vb = 7
-penColor('red')
-brushColor('red')
-bullet = circle(-5, -5, 3)
-dx = dy = 1
-penSize(7)
-L = math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0))
-gun_draw(0)
+start = False
+menuEv = 0
+print('START ')
 onKey(keyPressed)
+
 onTimer(shooting_check, 1000)
 onTimer(movement, 50)
+
 run()
