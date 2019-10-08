@@ -1,7 +1,36 @@
-
 from graph import *
 import math
 from sys import platform
+def Abs(a):
+    if a<0:
+        return -a
+    return a
+def GenerateWall():
+    global walls, wallCoords,deltaSize
+    walls = []
+    size = 4
+    color = randColor()
+    wallCoord = ((0,0),(0+deltaSize,0),(0,0+deltaSize),(0,0+2*deltaSize))
+    penColor(color)
+    brushColor(color)
+    for i in range(size):
+        w = rectangle(wallCoord[i][0],wallCoord[i][1],wallCoord[i][0]+deltaSize,wallCoord[i][1]+deltaSize)
+        walls.append(w)
+def CheckWallCollision(bullet):
+    global deltasize
+    mark = False
+    for w in walls:
+        wX = coords(w)[0]+deltaSize/2
+        wY = coords(w)[1]+deltaSize/2
+        bX = coords(bullet)[0]
+        bY = coords(bullet)[1]
+        print(wX,wY,bX,bY)
+        if (Abs(wX -bX)< deltaSize/2 and Abs(wY-bY)< deltaSize/2):
+            moveObjectTo(w,600,600)
+            mark = True
+    return  mark
+
+
 
 def gun_draw(new_angle):
     global tower, L, angle, gun, x1, y1, x0, y0
@@ -34,6 +63,7 @@ def movement():
     moveObjectBy(tower, dx, dy)
     dx = dy = 0
 
+
 def keyPressed(event):
 	if platform == "win32" or platform == "cygwin":
 		global dx, dy, bulletbool
@@ -54,7 +84,6 @@ def keyPressed(event):
 		elif event.keycode == VK_ESCAPE:
 			close()
 	elif platform == "linux":
-		global dx, dy, bulletbool
 		if event.keycode == VK_INSERT:  # Q
 			gun_draw(angle + 5)
 		elif event.keycode == VK_DELETE:  # E
@@ -71,7 +100,7 @@ def keyPressed(event):
 			shooting()
 		elif event.keycode == VK_ESCAPE:
 			close()
-        
+
 
 def wall_check(side_number):  # 1 - left ; 2 - right; 3 - up; 4 - down;
     wall_bool = False
@@ -96,16 +125,22 @@ def shooting():
     bulletFlybool=True
 
 def bulletFly():
-	global bulletbool, bulletFlybool, t
-	if bulletFlybool==True:
-		aRad = angle * math.pi / 180
-		moveObjectBy(bullet, int( L * math.cos(aRad))//10, - int(L * math.sin(aRad))//10)
-		t=t+1
-	if t>100:
-		t=0
-		bulletFlybool=False
-		moveObjectTo(bullet, -5, -5)
+    global bulletbool, bulletFlybool, t, bullet
 
+    if CheckWallCollision(bullet)==True:
+        bulletFlybool = False
+    if bulletFlybool==True:
+        aRad = angle * math.pi / 180
+        moveObjectBy(bullet, int( L * math.cos(aRad))//10, - int(L * math.sin(aRad))//10)
+        t=t+1
+    if t>100:
+        t=0
+        bulletFlybool=False
+        moveObjectTo(bullet, -5, -5)
+
+global walls, wallCoords,deltaSize
+deltaSize = 50
+GenerateWall()
 
 windowSize(400, 400)
 canvasSize(400, 400)
