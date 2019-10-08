@@ -4,8 +4,9 @@ from sys import platform
 def Abs(a):
     if a<0:
         return -a
-def GenerateWall(deltaSize):
-    global walls, wallCoords
+    return a
+def GenerateWall():
+    global walls, wallCoords,deltaSize
     walls = []
     size = 4
     color = randColor()
@@ -16,13 +17,15 @@ def GenerateWall(deltaSize):
         w = rectangle(wallCoord[i][0],wallCoord[i][1],wallCoord[i][0]+deltaSize,wallCoord[i][1]+deltaSize)
         walls.append(w)
 def CheckWallCollision(bullet):
+    global deltasize
     mark = False
     for w in walls:
-        wX = coords(w)[0]
-        wY = coords(w)[1]
+        wX = coords(w)[0]+deltaSize/2
+        wY = coords(w)[1]+deltaSize/2
         bX = coords(bullet)[0]
         bY = coords(bullet)[1]
-        if (Abs(wX -bX)< 5 and Abs(wY-bY)< 5):
+        print(wX,wY,bX,bY)
+        if (Abs(wX -bX)< deltaSize/2 and Abs(wY-bY)< deltaSize/2):
             moveObjectTo(w,600,600)
             mark = True
     return  mark
@@ -122,19 +125,22 @@ def shooting():
     bulletFlybool=True
 
 def bulletFly():
-	global bulletbool, bulletFlybool, t
+    global bulletbool, bulletFlybool, t, bullet
 
-	if bulletFlybool==True:
-		aRad = angle * math.pi / 180
-		moveObjectBy(bullet, int( L * math.cos(aRad))//10, - int(L * math.sin(aRad))//10)
-		t=t+1
-	if t>100:
-		t=0
-		bulletFlybool=False
-		moveObjectTo(bullet, -5, -5)
+    if CheckWallCollision(bullet)==True:
+        bulletFlybool = False
+    if bulletFlybool==True:
+        aRad = angle * math.pi / 180
+        moveObjectBy(bullet, int( L * math.cos(aRad))//10, - int(L * math.sin(aRad))//10)
+        t=t+1
+    if t>100:
+        t=0
+        bulletFlybool=False
+        moveObjectTo(bullet, -5, -5)
 
-global walls, wallCoords
-GenerateWall(50)
+global walls, wallCoords,deltaSize
+deltaSize = 50
+GenerateWall()
 
 windowSize(400, 400)
 canvasSize(400, 400)
